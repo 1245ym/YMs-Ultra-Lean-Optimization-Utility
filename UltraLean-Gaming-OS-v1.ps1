@@ -1,5 +1,5 @@
 UltraLean-Gaming-OS-v1 for powershell(run as admin,just copy and paste:it is tested and fully safe)
-TO RUN THE CODE COPY AN DPASTE THIS INTO POWERSHELL AS ADMIN:irm https://raw.githubusercontent.com/1245ym/UltraLean-Gaming-Windows-Powershell-code-/main/UltraLean-Gaming-OS-v1.ps1 | iex
+TO RUN THE CODE COPY AND PASTE THIS INTO POWERSHELL AS ADMIN:irm https://raw.githubusercontent.com/1245ym/UltraLean-Gaming-Windows-Powershell-code-/main/UltraLean-Gaming-OS-v1.ps1 | iex
 
 =====================================================
 # 💀 GOD MODE ULTRA-GAMING DESKTOP WINDOWS 10 💀
