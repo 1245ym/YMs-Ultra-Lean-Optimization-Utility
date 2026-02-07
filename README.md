@@ -1,4 +1,4 @@
-Before you run the the code below PLZ read my disclaimers and warnings and what it does:
+Before you run the the code below PLZ read my disclaimers and warnings and what it does,this is very powerfull:
 
 irm https://raw.githubusercontent.com/1245ym/UltraLean-Gaming-Windows-Powershell-code-/main/UltraLean-Gaming-OS-v1.ps1 | iex
 
