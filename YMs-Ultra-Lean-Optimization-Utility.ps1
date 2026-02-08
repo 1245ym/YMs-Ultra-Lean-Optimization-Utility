@@ -1,5 +1,4 @@
-TO RUN THE CODE COPY AND PASTE THIS INTO POWERSHELL AS ADMIN:irm https://raw.githubusercontent.com/1245ym/YMs-Ultra-Lean-Optimization-Utility/main/YMs-UltraLean-Optimization-Utility.ps1 | iex
-
+TO RUN THE CODE COPY AND PASTE THIS INTO POWERSHELL AS ADMIN:irm https://raw.githubusercontent.com/1245ym/YMs-Ultra-Lean-Optimization-Utility/refs/heads/main/YMs-Ultra-Lean-Optimization-Utility.ps1 | iex
 
 
 # =========================================================
