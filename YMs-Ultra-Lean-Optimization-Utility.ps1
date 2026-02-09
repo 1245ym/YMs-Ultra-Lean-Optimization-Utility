@@ -5,6 +5,10 @@ TO RUN THE CODE COPY AND PASTE THIS INTO POWERSHELL AS ADMIN:irm https://raw.git
 # YMs-Ultra-Lean-Optimization-Utility
 # =========================================================
 
+# =========================================================
+# YMs-Ultra-Lean-Optimization-Utility
+# =========================================================
+
 Add-Type -AssemblyName PresentationFramework
 
 # ---------------- CORE ----------------
@@ -75,7 +79,7 @@ function Undo-GamingTweaks {
     Apply-Registry "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" "SystemResponsiveness" 20
 }
 
-# ---------------- APPS (WITH DESCRIPTIONS) ----------------
+# ---------------- APPS ----------------
 
 $Apps = @(
     @{ Name="Xbox App"; Pkg="Microsoft.XboxApp"; Desc="Xbox console companion and social features" },
@@ -100,14 +104,17 @@ function Restore-App($Pkg) {
 
 # ---------------- UI ----------------
 
+# Build dynamic checkboxes
 $appCheckboxes = ""
 foreach ($a in $Apps) {
     $safe = $a.Name.Replace(" ","_")
-    $appCheckboxes += "<CheckBox x:Name='APP_$safe' Content='$($a.Name) – $($a.Desc)' Margin='0,3,0,0'/>"
+    $appCheckboxes += "<CheckBox x:Name='APP_$safe' Content='$($a.Name) – $($a.Desc)' Margin='0,3,0,0'/>`n"
 }
 
-[xml]$XAML = @"
+# Build XAML (as plain string first)
+$XAML = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WinTweak Control Center"
         Height="700" Width="800"
         WindowStartupLocation="CenterScreen">
@@ -179,6 +186,8 @@ Margin="0,10,0,0"/>
 </Window>
 "@
 
+# Convert to XML AFTER variable expansion
+[xml]$XAML = $XAML
 $reader = New-Object System.Xml.XmlNodeReader $XAML
 $Window = [Windows.Markup.XamlReader]::Load($reader)
 
@@ -223,4 +232,3 @@ $UndoBtn.Add_Click({
 })
 
 $Window.ShowDialog() | Out-Null
-
