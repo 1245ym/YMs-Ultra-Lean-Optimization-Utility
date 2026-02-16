@@ -1,10 +1,3 @@
-<# ============================================================
- Yusuf Mullas WinUtil – Ultra Ultimate Edition (FULL BUILD)
- Author : Yusuf Mullas
- License: MIT
- Version: 2026.02.14
-============================================================ #>
-
 #region ================= ADMIN CHECK =================
 if (-not ([Security.Principal.WindowsPrincipal]
     [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -16,7 +9,6 @@ if (-not ([Security.Principal.WindowsPrincipal]
     exit
 }
 #endregion
-
 #region ================= GLOBALS =================
 $global:WinUtil = @{
     Name    = "Yusuf Mullas WinUtil"
@@ -26,7 +18,6 @@ $global:WinUtil = @{
 $global:DryRun  = $false
 $global:LogPath = Join-Path $env:USERPROFILE "YusufWinUtil.log"
 #endregion
-
 #region ================= LOGGING =================
 function Log {
     param(
@@ -58,7 +49,6 @@ function Create-RestorePoint {
     }
 }
 #endregion
-
 #region ================= APP MAP =================
 $global:AppMap = @{
     "Google Chrome"   = "Google.Chrome"
@@ -90,7 +80,6 @@ $global:AppDescriptions = @{
     "7-Zip" = "File archiver"
 }
 #endregion
-
 #region ================= APP MODEL =================
 $global:AppsModel = $AppMap.Keys | ForEach-Object {
     [pscustomobject]@{
@@ -101,7 +90,6 @@ $global:AppsModel = $AppMap.Keys | ForEach-Object {
     }
 }
 #endregion
-
 #region ================= WPF =================
 Add-Type -AssemblyName PresentationFramework
 
@@ -195,7 +183,6 @@ $window = [Windows.Markup.XamlReader]::Load(
 )
 
 #endregion
-
 #region ================= BIND =================
 $AppsPanel     = $window.FindName("AppsPanel")
 $InstallApps  = $window.FindName("InstallAppsBtn")
@@ -213,7 +200,6 @@ $PerfBtn      = $window.FindName("PerfBtn")
 
 $AppsPanel.ItemsSource = $AppsModel
 #endregion
-
 #region ================= INSTALL APPS =================
 $InstallApps.Add_Click({
     $global:DryRun = $DryRunChk.IsChecked
@@ -238,7 +224,6 @@ $InstallApps.Add_Click({
     }
 })
 #endregion
-
 #region ================= DEBLOAT =================
 function Remove-Bloat {
     Create-RestorePoint
@@ -262,7 +247,6 @@ $DebloatBtn.Add_Click({
     [System.Windows.MessageBox]::Show("Debloat complete. Reboot recommended.")
 })
 #endregion
-
 #region ================= PROFILES =================
 function Apply-Profile($Name) {
     Create-RestorePoint
@@ -275,7 +259,6 @@ $StreamingBtn.Add_Click({ Apply-Profile "Streaming" })
 $WorkBtn.Add_Click({ Apply-Profile "Work" })
 $PerfBtn.Add_Click({ Apply-Profile "Performance" })
 #endregion
-
 #region ================= RUN =================
 $window.ShowDialog() | Out-Null
 #endregion
