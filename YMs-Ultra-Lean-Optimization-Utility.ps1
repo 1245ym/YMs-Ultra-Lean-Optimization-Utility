@@ -9,6 +9,7 @@ if (-not ([Security.Principal.WindowsPrincipal]
     exit
 }
 #endregion
+
 #region ================= GLOBALS =================
 $global:WinUtil = @{
     Name    = "Yusuf Mullas WinUtil"
@@ -18,6 +19,7 @@ $global:WinUtil = @{
 $global:DryRun  = $false
 $global:LogPath = Join-Path $env:USERPROFILE "YusufWinUtil.log"
 #endregion
+
 #region ================= LOGGING =================
 function Log {
     param(
@@ -49,37 +51,39 @@ function Create-RestorePoint {
     }
 }
 #endregion
+
 #region ================= APP MAP =================
 $global:AppMap = @{
-    "Google Chrome"   = "Google.Chrome"
-    "Firefox"         = "Mozilla.Firefox"
-    "Brave"           = "Brave.Brave"
-    "Visual Studio Code" = "Microsoft.VisualStudioCode"
-    "Git"             = "Git.Git"
-    "Python 3"        = "Python.Python.3"
-    "Node.js LTS"     = "OpenJS.NodeJS.LTS"
-    "Steam"           = "Valve.Steam"
-    "Discord"         = "Discord.Discord"
-    "VLC"             = "VideoLAN.VLC"
-    "OBS Studio"      = "OBSProject.OBSStudio"
-    "7-Zip"           = "7zip.7zip"
+    "Google Chrome"       = "Google.Chrome"
+    "Firefox"             = "Mozilla.Firefox"
+    "Brave"               = "Brave.Brave"
+    "Visual Studio Code"  = "Microsoft.VisualStudioCode"
+    "Git"                 = "Git.Git"
+    "Python 3"            = "Python.Python.3"
+    "Node.js LTS"         = "OpenJS.NodeJS.LTS"
+    "Steam"               = "Valve.Steam"
+    "Discord"             = "Discord.Discord"
+    "VLC"                 = "VideoLAN.VLC"
+    "OBS Studio"          = "OBSProject.OBSStudio"
+    "7-Zip"               = "7zip.7zip"
 }
 
 $global:AppDescriptions = @{
-    "Google Chrome" = "Fast Chromium browser"
-    "Firefox" = "Privacy-focused browser"
-    "Brave" = "Ad-blocking Chromium browser"
+    "Google Chrome"      = "Fast Chromium browser"
+    "Firefox"            = "Privacy-focused browser"
+    "Brave"              = "Ad-blocking Chromium browser"
     "Visual Studio Code" = "Code editor"
-    "Git" = "Version control"
-    "Python 3" = "Python runtime"
-    "Node.js LTS" = "JavaScript runtime"
-    "Steam" = "Game launcher"
-    "Discord" = "Voice and chat"
-    "VLC" = "Media player"
-    "OBS Studio" = "Streaming & recording"
-    "7-Zip" = "File archiver"
+    "Git"                = "Version control"
+    "Python 3"           = "Python runtime"
+    "Node.js LTS"        = "JavaScript runtime"
+    "Steam"              = "Game launcher"
+    "Discord"            = "Voice and chat"
+    "VLC"                = "Media player"
+    "OBS Studio"         = "Streaming & recording"
+    "7-Zip"              = "File archiver"
 }
 #endregion
+
 #region ================= APP MODEL =================
 $global:AppsModel = $AppMap.Keys | ForEach-Object {
     [pscustomobject]@{
@@ -90,11 +94,13 @@ $global:AppsModel = $AppMap.Keys | ForEach-Object {
     }
 }
 #endregion
+
 #region ================= WPF =================
-Add-Type -AssemblyName PresentationFramework
+Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase
 
 $xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Yusuf Mullas WinUtil"
         Height="650" Width="1100"
         Background="#1E1E1E"
@@ -102,78 +108,78 @@ $xaml = @"
         FontFamily="Segoe UI"
         WindowStartupLocation="CenterScreen">
 
-<Grid Margin="10">
-<Grid.ColumnDefinitions>
-<ColumnDefinition Width="3*"/>
-<ColumnDefinition Width="2*"/>
-</Grid.ColumnDefinitions>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
 
-<TabControl Grid.Column="0">
+        <TabControl Grid.Column="0">
 
-<TabItem Header="Apps">
-<StackPanel>
-<CheckBox x:Name="DryRunChk"
-          Content="Dry Run (Preview Only)"
-          Foreground="#FFAA00"
-          Margin="4"/>
+            <TabItem Header="Apps">
+                <StackPanel>
+                    <CheckBox x:Name="DryRunChk"
+                              Content="Dry Run (Preview Only)"
+                              Foreground="#FFAA00"
+                              Margin="4"/>
 
-<ScrollViewer Height="450">
-<ItemsControl x:Name="AppsPanel">
-<ItemsControl.ItemTemplate>
-<DataTemplate>
-<Border Margin="4" Padding="6" Background="#2A2A2A" CornerRadius="4">
-<StackPanel>
-<CheckBox Content="{Binding Name}"
-          IsChecked="{Binding Selected}"
-          FontWeight="SemiBold"/>
-<TextBlock Text="{Binding Description}"
-           FontSize="11"
-           Foreground="#AAAAAA"
-           Margin="20,2,0,0"/>
-</StackPanel>
-</Border>
-</DataTemplate>
-</ItemsControl.ItemTemplate>
-</ItemsControl>
-</ScrollViewer>
+                    <ScrollViewer Height="450">
+                        <ItemsControl x:Name="AppsPanel">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="4" Padding="6" Background="#2A2A2A" CornerRadius="4">
+                                        <StackPanel>
+                                            <CheckBox Content="{Binding Name}"
+                                                      IsChecked="{Binding Selected, Mode=TwoWay}"
+                                                      FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Description}"
+                                                       FontSize="11"
+                                                       Foreground="#AAAAAA"
+                                                       Margin="20,2,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
 
-<Button x:Name="InstallAppsBtn"
-        Content="Install Selected"
-        HorizontalAlignment="Right"
-        Margin="4"/>
-</StackPanel>
-</TabItem>
+                    <Button x:Name="InstallAppsBtn"
+                            Content="Install Selected"
+                            HorizontalAlignment="Right"
+                            Margin="4"/>
+                </StackPanel>
+            </TabItem>
 
-<TabItem Header="Debloat">
-<StackPanel Margin="10">
-<TextBlock Text="Aggressive Debloat" FontSize="18"/>
-<CheckBox x:Name="DebloatChk" Content="Remove Bloatware"/>
-<CheckBox x:Name="TelemetryChk" Content="Disable Telemetry"/>
-<CheckBox x:Name="SuggestChk" Content="Disable Suggestions"/>
-<Button x:Name="DebloatBtn" Content="Run Debloat"/>
-</StackPanel>
-</TabItem>
+            <TabItem Header="Debloat">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Aggressive Debloat" FontSize="18"/>
+                    <CheckBox x:Name="DebloatChk" Content="Remove Bloatware"/>
+                    <CheckBox x:Name="TelemetryChk" Content="Disable Telemetry"/>
+                    <CheckBox x:Name="SuggestChk" Content="Disable Suggestions"/>
+                    <Button x:Name="DebloatBtn" Content="Run Debloat" Margin="0,10,0,0"/>
+                </StackPanel>
+            </TabItem>
 
-<TabItem Header="Profiles">
-<StackPanel Margin="10">
-<Button x:Name="GamingBtn" Content="Gaming Mode"/>
-<Button x:Name="StreamingBtn" Content="Streaming Mode"/>
-<Button x:Name="WorkBtn" Content="Work Mode"/>
-<Button x:Name="PerfBtn" Content="Performance Mode"/>
-</StackPanel>
-</TabItem>
+            <TabItem Header="Profiles">
+                <StackPanel Margin="10" VerticalAlignment="Top">
+                    <Button x:Name="GamingBtn" Content="Gaming Mode" Margin="0,0,0,5"/>
+                    <Button x:Name="StreamingBtn" Content="Streaming Mode" Margin="0,0,0,5"/>
+                    <Button x:Name="WorkBtn" Content="Work Mode" Margin="0,0,0,5"/>
+                    <Button x:Name="PerfBtn" Content="Performance Mode" Margin="0,0,0,5"/>
+                </StackPanel>
+            </TabItem>
 
-</TabControl>
+        </TabControl>
 
-<Border Grid.Column="1"
-        Background="#202020"
-        BorderBrush="#444444"
-        BorderThickness="1"
-        Padding="8">
-<TextBlock Text="Check console for live logs."/>
-</Border>
+        <Border Grid.Column="1"
+                Background="#202020"
+                BorderBrush="#444444"
+                BorderThickness="1"
+                Padding="8">
+            <TextBlock Text="Check console for live logs."/>
+        </Border>
 
-</Grid>
+    </Grid>
 </Window>
 "@
 
@@ -181,29 +187,30 @@ $xaml = @"
 $window = [Windows.Markup.XamlReader]::Load(
     (New-Object System.Xml.XmlNodeReader $xml)
 )
-
 #endregion
+
 #region ================= BIND =================
 $AppsPanel     = $window.FindName("AppsPanel")
-$InstallApps  = $window.FindName("InstallAppsBtn")
-$DryRunChk    = $window.FindName("DryRunChk")
+$InstallApps   = $window.FindName("InstallAppsBtn")
+$DryRunChk     = $window.FindName("DryRunChk")
 
-$DebloatChk   = $window.FindName("DebloatChk")
-$TelemetryChk = $window.FindName("TelemetryChk")
-$SuggestChk   = $window.FindName("SuggestChk")
-$DebloatBtn   = $window.FindName("DebloatBtn")
+$DebloatChk    = $window.FindName("DebloatChk")
+$TelemetryChk  = $window.FindName("TelemetryChk")
+$SuggestChk    = $window.FindName("SuggestChk")
+$DebloatBtn    = $window.FindName("DebloatBtn")
 
-$GamingBtn    = $window.FindName("GamingBtn")
-$StreamingBtn = $window.FindName("StreamingBtn")
-$WorkBtn      = $window.FindName("WorkBtn")
-$PerfBtn      = $window.FindName("PerfBtn")
+$GamingBtn     = $window.FindName("GamingBtn")
+$StreamingBtn  = $window.FindName("StreamingBtn")
+$WorkBtn       = $window.FindName("WorkBtn")
+$PerfBtn       = $window.FindName("PerfBtn")
 
 $AppsPanel.ItemsSource = $AppsModel
 #endregion
+
 #region ================= INSTALL APPS =================
 $InstallApps.Add_Click({
     $global:DryRun = $DryRunChk.IsChecked
-    $selected = $AppsModel | Where-Object Selected
+    $selected = $AppsModel | Where-Object { $_.Selected }
 
     if (-not $selected) {
         [System.Windows.MessageBox]::Show("No apps selected")
@@ -219,11 +226,12 @@ $InstallApps.Add_Click({
         }
 
         Start-Process winget `
-            -ArgumentList "install --id `"$($app.WingetId)`" -e --accept-source-agreements --accept-package-agreements" `
+            -ArgumentList "install --id $($app.WingetId) -e --accept-source-agreements --accept-package-agreements" `
             -NoNewWindow
     }
 })
 #endregion
+
 #region ================= DEBLOAT =================
 function Remove-Bloat {
     Create-RestorePoint
@@ -233,25 +241,50 @@ function Remove-Bloat {
         Log "Removing $p"
         if ($global:DryRun) { continue }
 
-        Get-AppxPackage -Name $p -AllUsers |
+        Get-AppxPackage -AllUsers |
+            Where-Object { $_.Name -like $p } |
             Remove-AppxPackage -ErrorAction SilentlyContinue
     }
 }
 
 $DebloatBtn.Add_Click({
     $global:DryRun = $DryRunChk.IsChecked
-    if ($DebloatChk.IsChecked) { Remove-Bloat }
-    if ($TelemetryChk.IsChecked) { Log "Telemetry disabled" }
-    if ($SuggestChk.IsChecked) { Log "Suggestions disabled" }
+
+    if ($DebloatChk.IsChecked) {
+        Remove-Bloat
+    }
+
+    if ($TelemetryChk.IsChecked) {
+        Log "Telemetry disabled (placeholder – add specific tweaks here)"
+    }
+
+    if ($SuggestChk.IsChecked) {
+        Log "Suggestions disabled (placeholder – add specific tweaks here)"
+    }
 
     [System.Windows.MessageBox]::Show("Debloat complete. Reboot recommended.")
 })
 #endregion
+
 #region ================= PROFILES =================
-function Apply-Profile($Name) {
+function Apply-Profile {
+    param(
+        [string]$Name
+    )
+
     Create-RestorePoint
     Log "Applying profile: $Name"
-    powercfg -setactive SCHEME_MIN
+
+    $highPerf = powercfg -l | Select-String "High performance" | ForEach-Object {
+        ($_ -split '\s+')[3]
+    }
+
+    if ($highPerf) {
+        powercfg -setactive $highPerf
+        Log "High performance power plan applied"
+    } else {
+        Log "High performance plan not found" "WARN"
+    }
 }
 
 $GamingBtn.Add_Click({ Apply-Profile "Gaming" })
@@ -259,6 +292,9 @@ $StreamingBtn.Add_Click({ Apply-Profile "Streaming" })
 $WorkBtn.Add_Click({ Apply-Profile "Work" })
 $PerfBtn.Add_Click({ Apply-Profile "Performance" })
 #endregion
+
 #region ================= RUN =================
+Log "Starting $($WinUtil.Name) v$($WinUtil.Version)"
 $window.ShowDialog() | Out-Null
+Log "Exiting $($WinUtil.Name)"
 #endregion
