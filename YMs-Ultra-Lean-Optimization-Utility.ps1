@@ -24,9 +24,10 @@ $TweakCategories = @{
     }
 }
 
-# --- 2. THE GUI (WPF XML) ---
+# --- 2. THE GUI (WPF XML) - FIXED NAMESPACE ---
 [xml]$xaml = @"
-<Window xmlns="http://schemas.microsoft.com"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Windows Control Center - ULTIMATE EDITION" Height="600" Width="800" Background="#1E1E1E">
     <Grid Margin="20">
         <StackPanel>
@@ -51,9 +52,6 @@ $TweakCategories = @{
     </Grid>
 </Window>
 "@
-
-$reader = (New-Object System.Xml.XmlNodeReader $xaml)
-$Form = [Windows.Markup.XamlReader]::Load($reader)
 
 # --- 3. DYNAMIC LOGIC ---
 $TweakPanel = $Form.FindName("TweakPanel")
