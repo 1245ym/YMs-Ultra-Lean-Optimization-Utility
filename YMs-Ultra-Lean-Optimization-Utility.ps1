@@ -1,10 +1,7 @@
-Windows Control Center - ULTIMATE EDITION
-# 🚀 NEXT-GEN Windows Optimization with AI, Cloud Sync, Advanced Gaming & Security Hardening
-
+# Windows Control Center - ULTIMATE EDITION (Fixed)
 #Requires -RunAsAdministrator
 
-# Add required assemblies
-Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawing, System.Windows.Controls.DataVisualization, System.Web
+Add-Type -AssemblyName PresentationFramework, System.Windows.Forms, System.Drawing, System.Web
 
 # Global Variables
 $Global:IsDryRun = $false
@@ -20,9 +17,54 @@ $Global:UserPoints = 0
 $Global:UserStreak = 0
 $Global:SystemHealthScore = 0
 $Global:NetworkLatency = @()
-$Global:GamingMode = $false
-$Global:SecurityHardened = $false
-$Global:PerformanceBaseline = $null
+
+# Create directories
+@($Global:BackupPath, $Global:ProfilesPath) | ForEach-Object {
+    if (!(Test-Path $_)) { New-Item -ItemType Directory -Path $_ -Force }
+}
+
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO", [int]$Points = 0)
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogEntry = "[$Timestamp] [$Level] $Message"
+    $Color = switch ($Level) {
+        "ERROR" { "Red" }; "WARN" { "Yellow" }; "SUCCESS" { "Green" }; "AI" { "Cyan" }; default { "White" }
+    }
+    Write-Host $LogEntry -ForegroundColor $Color
+    Add-Content -Path $Global:LogPath -Value $LogEntry
+}
+
+# Advanced Network Latency Monitoring
+function Start-NetworkMonitoring {
+    param([int]$Duration = 60)
+    
+    Write-Log "🌐 Starting advanced network monitoring..." "AI"
+    $Global:NetworkLatency = @()
+    
+    # FIXED: Properly formatted array and closed parenthesis
+    $TestServers = @(
+        @{Name="Google"; Host="8.8.8.8"; Location="USA"},
+        @{Name="Cloudflare"; Host="1.1.1.1"; Location="Global"},
+        @{Name="OpenDNS"; Host="208.67.222.222"; Location="USA"},
+        @{Name="Quad9"; Host="9.9.9.9"; Location="Global"},
+        @{Name="Level3"; Host="4.2.2.2"; Location="USA"}
+    )
+
+    foreach ($Server in $TestServers) {
+        try {
+            $Ping = Test-Connection -ComputerName $Server.Host -Count 1 -ErrorAction Stop
+            $Latency = $Ping.ResponseTime
+            Write-Log "Ping to $($Server.Name): $($Latency)ms" "SUCCESS"
+        } catch {
+            Write-Log "Failed to ping $($Server.Name)" "WARN"
+        }
+    }
+}
+
+# Initialize and Run
+Initialize-Achievements
+Start-NetworkMonitoring -Duration 10
+
 
 # Create directories
 @($Global:BackupPath, $Global:ProfilesPath) | ForEach-Object {
