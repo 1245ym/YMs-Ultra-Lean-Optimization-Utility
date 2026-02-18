@@ -1,122 +1,110 @@
-# ==========================================================
-# BEAST ULTRA CONTROL CENTER - FULL GUI POWER & TWEAKS
-# ==========================================================
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 
-# --- 1. TWEAK DATABASE (skeleton, populate with 500+ tweaks) ---
+# --- 1. TWEAK DATABASE ---
+# Example tweaks; you can expand to 500+ manually later
 $TweakMatrix = @(
-    # Example tweaks - populate with your real 500+ tweaks later
     @{Name="Disable GameDVR"; Cat="Gaming"; Ben="Stops background recording to save CPU/GPU overhead."; Cmd={Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_Enabled" -Value 0}},
-    @{Name="Set Game Priority: High"; Cat="Gaming"; Ben="Prioritizes GPU resources for games over background apps."; Cmd={Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "GPU Priority" -Value 8}},
-    @{Name="Flush DNS Cache"; Cat="Network"; Ben="Clears DNS cache and resets Winsock."; Cmd={ipconfig /flushdns; netsh winsock reset}},
-    @{Name="Install Google Chrome"; Cat="Apps Installer"; Ben="Installs Google Chrome."; Cmd={ & winget install --id "Google.Chrome" -e }},
-    @{Name="Remove Xbox"; Cat="Debloater"; Ben="Removes Xbox app."; Cmd={Get-AppxPackage *xbox* | Remove-AppxPackage}}
-)
+    @{Name="Enable TCP RSS"; Cat="Network"; Ben="Allows multi-core CPU handling of network packets."; Cmd={netsh int tcp set global rss=enabled}},
+    @{Name="Ultimate Power Plan"; Cat="Performance"; Ben="Unlocks 'Ultimate Performance' power profile."; Cmd={powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61}},
+    @{Name="Install Google Chrome"; Cat="Winget"; Ben="Installs Google Chrome via winget."; Cmd={ & winget install --id "Google.Chrome" -e }},
+    @{Name="Disable Telemetry"; Cat="Security"; Ben="Stops Windows telemetry and data collection."; Cmd={Stop-Service "DiagTrack" -ErrorAction SilentlyContinue; Set-Service "DiagTrack" -StartupType Disabled}}
+) | ForEach-Object { [PSCustomObject]$_ }
 
-# --- 2. FORM SETUP ---
+# --- 2. GUI SETUP ---
 $Form = New-Object System.Windows.Forms.Form
-$Form.Text = "BEAST ULTRA CONTROL CENTER"
-$Form.Size = New-Object System.Drawing.Size(1300, 950)
+$Form.Text = "Ultra Lean Optimization Utility - Full Control Center"
+$Form.Size = New-Object System.Drawing.Size(1200, 900)
 $Form.StartPosition = "CenterScreen"
-$Form.BackColor = [System.Drawing.Color]::FromArgb(15,15,20)
+$Form.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
 
-# --- 3. DESCRIPTION LABEL ---
+# --- 3. Description Label ---
 $Intel = New-Object System.Windows.Forms.Label
-$Intel.Text = "Hover over a tweak to see its benefit."
-$Intel.Font = New-Object System.Drawing.Font("Consolas", 12)
+$Intel.Text = ">>> Hover over a tweak to see its benefit."
+$Intel.Font = New-Object System.Drawing.Font("Consolas",12,[System.Drawing.FontStyle]::Bold)
 $Intel.ForeColor = [System.Drawing.Color]::Lime
 $Intel.BackColor = [System.Drawing.Color]::FromArgb(20,20,25)
-$Intel.Size = New-Object System.Drawing.Size(1240, 60)
+$Intel.Size = New-Object System.Drawing.Size(1150,50)
 $Intel.Location = New-Object System.Drawing.Point(20,10)
 $Intel.TextAlign = "MiddleCenter"
 $Intel.BorderStyle = "FixedSingle"
 $Form.Controls.Add($Intel)
 
-# --- 4. TAB CONTROL ---
+# --- 4. Tab Control ---
 $TabControl = New-Object System.Windows.Forms.TabControl
-$TabControl.Size = New-Object System.Drawing.Size(1240, 720)
-$TabControl.Location = New-Object System.Drawing.Point(20, 80)
+$TabControl.Size = New-Object System.Drawing.Size(1150,700)
+$TabControl.Location = New-Object System.Drawing.Point(20,70)
 $Form.Controls.Add($TabControl)
 
-# --- 5. CREATE TABS BASED ON CATEGORIES ---
+# --- 5. Create tabs dynamically ---
 $Categories = $TweakMatrix | Select-Object -ExpandProperty Cat -Unique
 $TabPages = @{}
+
 foreach ($Cat in $Categories) {
     $Tab = New-Object System.Windows.Forms.TabPage
     $Tab.Text = $Cat
-    $Tab.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
-    $TabControl.TabPages.Add($Tab)
+    $FlowPanel = New-Object System.Windows.Forms.FlowLayoutPanel
+    $FlowPanel.Name = "FlowPanel"
+    $FlowPanel.Dock = "Fill"
+    $FlowPanel.AutoScroll = $true
+    $Tab.Controls.Add($FlowPanel)
     $TabPages[$Cat] = $Tab
+    $TabControl.TabPages.Add($Tab)
 }
 
-# --- 6. ADD CHECKBOXES DYNAMICALLY ---
+# --- 6. Add Checkboxes to Tabs ---
 $Checkboxes = @()
 foreach ($T in $TweakMatrix) {
     $CB = New-Object System.Windows.Forms.CheckBox
-    $CB.Text = "[$($T.Cat)] $($T.Name)"
-    $CB.ForeColor = switch($T.Cat) {
-        "Gaming" { "Cyan" }
-        "Network" { "Lime" }
-        "Performance" { "Orange" }
-        "Disk" { "Magenta" }
-        "Apps Installer" { "Yellow" }
-        "Debloater" { "Red" }
-        default { "White" }
-    }
-    $CB.Font = New-Object System.Drawing.Font("Segoe UI", 10)
-    $CB.Size = New-Object System.Drawing.Size(1100,30)
+    $CB.Text = $T.Name
     $CB.Tag = $T
-    $CB.Add_MouseEnter({ $Intel.Text = ">>> BENEFIT: " + $this.Tag.Ben })
+    $CB.AutoSize = $true
+    $CB.Font = New-Object System.Drawing.Font("Segoe UI",10)
     
-    # Add to correct tab with FlowLayoutPanel for scroll
-    if (-not $TabPages[$T.Cat].Controls.ContainsKey("FlowPanel")) {
-        $Flow = New-Object System.Windows.Forms.FlowLayoutPanel
-        $Flow.Name = "FlowPanel"
-        $Flow.Size = New-Object System.Drawing.Size(1180,680)
-        $Flow.AutoScroll = $true
-        $Flow.FlowDirection = "TopDown"
-        $Flow.WrapContents = $false
-        $Flow.BackColor = [System.Drawing.Color]::FromArgb(15,15,20)
-        $TabPages[$T.Cat].Controls.Add($Flow)
-    }
+    # Hover description
+    $CB.Add_MouseEnter({ $Intel.Text = ">>> Benefit: " + $this.Tag.Ben })
+    $CB.Add_MouseLeave({ $Intel.Text = ">>> Hover over a tweak to see its benefit." })
+    
     $TabPages[$T.Cat].Controls["FlowPanel"].Controls.Add($CB)
     $Checkboxes += $CB
 }
 
-# --- 7. RESTORE POINT BUTTON ---
+# --- 7. Buttons ---
+# Restore Point
 $BackupBtn = New-Object System.Windows.Forms.Button
 $BackupBtn.Text = "CREATE RESTORE POINT"
-$BackupBtn.Size = New-Object System.Drawing.Size(600,50)
-$BackupBtn.Location = New-Object System.Drawing.Point(20,820)
+$BackupBtn.Size = New-Object System.Drawing.Size(550,50)
+$BackupBtn.Location = New-Object System.Drawing.Point(20,780)
 $BackupBtn.BackColor = [System.Drawing.Color]::FromArgb(40,40,40)
 $BackupBtn.ForeColor = [System.Drawing.Color]::Yellow
 $BackupBtn.FlatStyle = "Flat"
+$BackupBtn.Font = New-Object System.Drawing.Font("Segoe UI",10,[System.Drawing.FontStyle]::Bold)
 $BackupBtn.Add_Click({
-    $Intel.Text = "Creating restore point..."
-    Checkpoint-Computer -Description "BeastUltra_Backup" -RestorePointType "MODIFY_SETTINGS" -ErrorAction SilentlyContinue
+    $Intel.Text = "Creating system restore point..."
+    Checkpoint-Computer -Description "UltraLean_Backup" -RestorePointType "MODIFY_SETTINGS" -ErrorAction SilentlyContinue
     $Intel.Text = "Restore point created successfully!"
 })
 $Form.Controls.Add($BackupBtn)
 
-# --- 8. APPLY SELECTED TWEAKS BUTTON ---
+# Apply Tweaks
 $RunBtn = New-Object System.Windows.Forms.Button
 $RunBtn.Text = "APPLY SELECTED TWEAKS"
-$RunBtn.Size = New-Object System.Drawing.Size(600,50)
-$RunBtn.Location = New-Object System.Drawing.Point(660,820)
+$RunBtn.Size = New-Object System.Drawing.Size(550,50)
+$RunBtn.Location = New-Object System.Drawing.Point(600,780)
 $RunBtn.BackColor = [System.Drawing.Color]::FromArgb(30,30,40)
 $RunBtn.ForeColor = [System.Drawing.Color]::Cyan
 $RunBtn.FlatStyle = "Flat"
-$RunBtn.Font = New-Object System.Drawing.Font("Segoe UI",12,[System.Drawing.FontStyle]::Bold)
+$RunBtn.Font = New-Object System.Drawing.Font("Segoe UI",10,[System.Drawing.FontStyle]::Bold)
 $RunBtn.Add_Click({
     $Applied = 0
     foreach ($CB in $Checkboxes) {
         if ($CB.Checked) {
-            try { & $CB.Tag.Cmd; $Applied++ } catch { Write-Warning "Failed: $($CB.Text)" }
+            Write-Host "Applying: $($CB.Text)" -ForegroundColor Cyan
+            try { & $CB.Tag.Cmd; $Applied++ } catch { Write-Host "Failed: $($CB.Text)" -ForegroundColor Red }
         }
     }
-    [System.Windows.Forms.MessageBox]::Show("$Applied tweaks applied! Restart PC for full effect.")
+    [System.Windows.Forms.MessageBox]::Show("$Applied tweaks applied! Restart PC for changes to take effect.")
 })
 $Form.Controls.Add($RunBtn)
 
-# --- 9. SHOW FORM ---
+# --- 8. Show GUI ---
 $Form.ShowDialog() | Out-Null
