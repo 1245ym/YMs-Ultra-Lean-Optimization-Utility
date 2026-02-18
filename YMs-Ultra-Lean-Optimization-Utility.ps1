@@ -1,110 +1,93 @@
 # ==========================================================
-# BEAST ULTRA CONTROL CENTER v1.0
-# 50+ Tweaks | Gaming | Drivers | Performance | Network | Security | Winget Installer
-# Fully GUI | PowerShell 5.1+ Compatible
+# BEAST ULTRA CONTROL CENTER - FULL GUI POWER & TWEAKS
 # ==========================================================
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 
-# -------------------- 1. TWEAK DATABASE --------------------
+# --- 1. TWEAK DATABASE (skeleton, populate with 500+ tweaks) ---
 $TweakMatrix = @(
-    # --- SYSTEM & GAMING ---
+    # Example tweaks - populate with your real 500+ tweaks later
     @{Name="Disable GameDVR"; Cat="Gaming"; Ben="Stops background recording to save CPU/GPU overhead."; Cmd={Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_Enabled" -Value 0}},
     @{Name="Set Game Priority: High"; Cat="Gaming"; Ben="Prioritizes GPU resources for games over background apps."; Cmd={Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "GPU Priority" -Value 8}},
-    @{Name="Disable Power Throttling"; Cat="Gaming"; Ben="Prevents CPU downclocking during intense sessions."; Cmd={Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling" -Name "PowerThrottlingOff" -Value 1}},
-    @{Name="Optimize GPU Pre-Rendered Frames"; Cat="Gaming"; Ben="Tweaks DirectX to reduce input delay between CPU and GPU."; Cmd={Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\DirectX" -Name "UserGpuPreference" -Value 2}},
-
-    # --- DRIVER MANAGEMENT ---
-    @{Name="Install NVIDIA Drivers"; Cat="Driver Management"; Ben="Installs or updates NVIDIA drivers via winget."; Cmd={ & winget install --id "NVIDIA.GeForceExperience" -e }},
-    @{Name="Install Intel Drivers"; Cat="Driver Management"; Ben="Installs or updates Intel drivers via winget."; Cmd={ & winget install --id "Intel.IntelGraphicsCommandCenter" -e }},
-    @{Name="Update All Drivers"; Cat="Driver Management"; Ben="Updates all system drivers via winget."; Cmd={ & winget upgrade --all -e }},
-
-    # --- NETWORK & PING ---
-    @{Name="Enable TCP RSS"; Cat="Network"; Ben="Allows multi-core CPU handling of network packets."; Cmd={netsh int tcp set global rss=enabled}},
-    @{Name="Flush DNS Cache"; Cat="Network"; Ben="Clears stale DNS and resets Winsock for fresh connections."; Cmd={ipconfig /flushdns; netsh winsock reset}},
-
-    # --- PERFORMANCE ---
-    @{Name="Unpark All CPU Cores"; Cat="Performance"; Ben="Forces all cores to remain at 100% frequency."; Cmd={powercfg -setacvalueindex scheme_current sub_processor CPMAXCORES 100; powercfg -setactive scheme_current}},
-    @{Name="Ultimate Power Plan"; Cat="Performance"; Ben="Unlocks the 'Ultimate Performance' power profile."; Cmd={powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61}},
-
-    # --- DISK & STORAGE ---
-    @{Name="Disable NTFS Last Access"; Cat="Disk"; Ben="Stops Windows from updating a timestamp every time a file is read."; Cmd={fsutil behavior set disablelastaccess 1}},
-    @{Name="Optimize SSD Trim"; Cat="Disk"; Ben="Ensures Windows actively cleans SSD cells for high write speeds."; Cmd={fsutil behavior set disabledeletenotify 0}},
-
-    # --- SECURITY & PRIVACY ---
-    @{Name="Disable Telemetry"; Cat="Security"; Ben="Stops Windows spying and background data collection."; Cmd={Stop-Service "DiagTrack" -ErrorAction SilentlyContinue; Set-Service "DiagTrack" -StartupType Disabled}},
-    @{Name="Enable Windows Defender"; Cat="Security"; Ben="Ensures Windows Defender Antivirus is running."; Cmd={Set-Service -Name "WinDefend" -StartupType "Automatic"; Start-Service "WinDefend"}},
-
-    # --- WINGET INSTALLER ---
-    @{Name="Install Google Chrome"; Cat="Winget"; Ben="Installs Google Chrome."; Cmd={ & winget install --id "Google.Chrome" -e }},
-    @{Name="Install 7-Zip"; Cat="Winget"; Ben="Installs 7-Zip."; Cmd={ & winget install --id "7zip.7zip" -e }},
-    @{Name="Install VLC Media Player"; Cat="Winget"; Ben="Installs VLC Media Player."; Cmd={ & winget install --id "VideoLAN.VLC" -e }}
+    @{Name="Flush DNS Cache"; Cat="Network"; Ben="Clears DNS cache and resets Winsock."; Cmd={ipconfig /flushdns; netsh winsock reset}},
+    @{Name="Install Google Chrome"; Cat="Apps Installer"; Ben="Installs Google Chrome."; Cmd={ & winget install --id "Google.Chrome" -e }},
+    @{Name="Remove Xbox"; Cat="Debloater"; Ben="Removes Xbox app."; Cmd={Get-AppxPackage *xbox* | Remove-AppxPackage}}
 )
 
-# -------------------- 2. GUI --------------------
+# --- 2. FORM SETUP ---
 $Form = New-Object System.Windows.Forms.Form
-$Form.Text = "BEAST ULTRA CONTROL CENTER v1.0"
-$Form.Size = New-Object System.Drawing.Size(1200,900)
-$Form.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
+$Form.Text = "BEAST ULTRA CONTROL CENTER"
+$Form.Size = New-Object System.Drawing.Size(1300, 950)
 $Form.StartPosition = "CenterScreen"
+$Form.BackColor = [System.Drawing.Color]::FromArgb(15,15,20)
 
-# Label for descriptions
+# --- 3. DESCRIPTION LABEL ---
 $Intel = New-Object System.Windows.Forms.Label
-$Intel.Text = ">>> Hover over a tweak to view its description."
-$Intel.Font = New-Object System.Drawing.Font("Consolas",12)
+$Intel.Text = "Hover over a tweak to see its benefit."
+$Intel.Font = New-Object System.Drawing.Font("Consolas", 12)
 $Intel.ForeColor = [System.Drawing.Color]::Lime
 $Intel.BackColor = [System.Drawing.Color]::FromArgb(20,20,25)
-$Intel.Size = New-Object System.Drawing.Size(1150,60)
+$Intel.Size = New-Object System.Drawing.Size(1240, 60)
 $Intel.Location = New-Object System.Drawing.Point(20,10)
 $Intel.TextAlign = "MiddleCenter"
 $Intel.BorderStyle = "FixedSingle"
 $Form.Controls.Add($Intel)
 
-# TabControl for organization
+# --- 4. TAB CONTROL ---
 $TabControl = New-Object System.Windows.Forms.TabControl
-$TabControl.Size = New-Object System.Drawing.Size(1160,700)
-$TabControl.Location = New-Object System.Drawing.Point(20,80)
+$TabControl.Size = New-Object System.Drawing.Size(1240, 720)
+$TabControl.Location = New-Object System.Drawing.Point(20, 80)
+$Form.Controls.Add($TabControl)
 
-# Create tabs
-$Tabs = @{}
-$Categories = "Gaming","Driver Management","Performance","Disk","Network","Security","Winget"
+# --- 5. CREATE TABS BASED ON CATEGORIES ---
+$Categories = $TweakMatrix | Select-Object -ExpandProperty Cat -Unique
+$TabPages = @{}
 foreach ($Cat in $Categories) {
     $Tab = New-Object System.Windows.Forms.TabPage
     $Tab.Text = $Cat
-    $Tab.BackColor = [System.Drawing.Color]::FromArgb(15,15,20)
+    $Tab.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
     $TabControl.TabPages.Add($Tab)
-    $Tabs[$Cat] = $Tab
+    $TabPages[$Cat] = $Tab
 }
 
-$Form.Controls.Add($TabControl)
-
-# Add checkboxes to tabs
+# --- 6. ADD CHECKBOXES DYNAMICALLY ---
 $Checkboxes = @()
 foreach ($T in $TweakMatrix) {
     $CB = New-Object System.Windows.Forms.CheckBox
     $CB.Text = "[$($T.Cat)] $($T.Name)"
     $CB.ForeColor = switch($T.Cat) {
         "Gaming" { "Cyan" }
-        "Driver Management" { "Orange" }
-        "Performance" { "Lime" }
+        "Network" { "Lime" }
+        "Performance" { "Orange" }
         "Disk" { "Magenta" }
-        "Network" { "Green" }
-        "Security" { "Red" }
-        "Winget" { "Yellow" }
+        "Apps Installer" { "Yellow" }
+        "Debloater" { "Red" }
         default { "White" }
     }
-    $CB.Font = New-Object System.Drawing.Font("Segoe UI",10)
-    $CB.Size = New-Object System.Drawing.Size(1000,35)
+    $CB.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+    $CB.Size = New-Object System.Drawing.Size(1100,30)
     $CB.Tag = $T
     $CB.Add_MouseEnter({ $Intel.Text = ">>> BENEFIT: " + $this.Tag.Ben })
-    $Tabs[$T.Cat].Controls.Add($CB)
+    
+    # Add to correct tab with FlowLayoutPanel for scroll
+    if (-not $TabPages[$T.Cat].Controls.ContainsKey("FlowPanel")) {
+        $Flow = New-Object System.Windows.Forms.FlowLayoutPanel
+        $Flow.Name = "FlowPanel"
+        $Flow.Size = New-Object System.Drawing.Size(1180,680)
+        $Flow.AutoScroll = $true
+        $Flow.FlowDirection = "TopDown"
+        $Flow.WrapContents = $false
+        $Flow.BackColor = [System.Drawing.Color]::FromArgb(15,15,20)
+        $TabPages[$T.Cat].Controls.Add($Flow)
+    }
+    $TabPages[$T.Cat].Controls["FlowPanel"].Controls.Add($CB)
     $Checkboxes += $CB
 }
 
-# Buttons
+# --- 7. RESTORE POINT BUTTON ---
 $BackupBtn = New-Object System.Windows.Forms.Button
 $BackupBtn.Text = "CREATE RESTORE POINT"
-$BackupBtn.Size = New-Object System.Drawing.Size(540,50)
-$BackupBtn.Location = New-Object System.Drawing.Point(20,800)
+$BackupBtn.Size = New-Object System.Drawing.Size(600,50)
+$BackupBtn.Location = New-Object System.Drawing.Point(20,820)
 $BackupBtn.BackColor = [System.Drawing.Color]::FromArgb(40,40,40)
 $BackupBtn.ForeColor = [System.Drawing.Color]::Yellow
 $BackupBtn.FlatStyle = "Flat"
@@ -115,10 +98,11 @@ $BackupBtn.Add_Click({
 })
 $Form.Controls.Add($BackupBtn)
 
+# --- 8. APPLY SELECTED TWEAKS BUTTON ---
 $RunBtn = New-Object System.Windows.Forms.Button
 $RunBtn.Text = "APPLY SELECTED TWEAKS"
-$RunBtn.Size = New-Object System.Drawing.Size(540,50)
-$RunBtn.Location = New-Object System.Drawing.Point(610,800)
+$RunBtn.Size = New-Object System.Drawing.Size(600,50)
+$RunBtn.Location = New-Object System.Drawing.Point(660,820)
 $RunBtn.BackColor = [System.Drawing.Color]::FromArgb(30,30,40)
 $RunBtn.ForeColor = [System.Drawing.Color]::Cyan
 $RunBtn.FlatStyle = "Flat"
@@ -127,13 +111,12 @@ $RunBtn.Add_Click({
     $Applied = 0
     foreach ($CB in $Checkboxes) {
         if ($CB.Checked) {
-            Write-Host "Applying: $($CB.Text)" -ForegroundColor Cyan
-            try { & $CB.Tag.Cmd; $Applied++ } catch { Write-Host "Error applying $($CB.Text)" -ForegroundColor Red }
+            try { & $CB.Tag.Cmd; $Applied++ } catch { Write-Warning "Failed: $($CB.Text)" }
         }
     }
-    [System.Windows.Forms.MessageBox]::Show("$Applied Tweaks Applied! Restart PC for full effect.")
+    [System.Windows.Forms.MessageBox]::Show("$Applied tweaks applied! Restart PC for full effect.")
 })
 $Form.Controls.Add($RunBtn)
 
-# Show the GUI
+# --- 9. SHOW FORM ---
 $Form.ShowDialog() | Out-Null
