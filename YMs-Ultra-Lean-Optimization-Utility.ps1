@@ -1,10 +1,9 @@
-
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 
 # --- 1. DEFINE SECTIONS AND TWEAKS ---
 $Sections = @{}
 
-# --- Gaming Performance (10 real tweaks, expandable) ---
+# --- Gaming Performance (15 real tweaks) ---
 $Sections["Gaming Performance"] = @(
     [PSCustomObject]@{ Name="Disable GameDVR"; Cat="Gaming Performance"; Ben="Stops Xbox Game Bar recording to save CPU/GPU."; Cmd={ Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_Enabled" -Value 0 } },
     [PSCustomObject]@{ Name="Enable HAGS"; Cat="Gaming Performance"; Ben="Hardware-accelerated GPU scheduling."; Cmd={ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" -Name "HwSchMode" -Type DWord -Value 2 } },
@@ -15,10 +14,15 @@ $Sections["Gaming Performance"] = @(
     [PSCustomObject]@{ Name="Increase Network Packet Priority"; Cat="Gaming Performance"; Ben="Boosts gaming packets priority."; Cmd={ New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" -Name "NetworkThrottlingIndex" -PropertyType DWord -Value 0 -Force } },
     [PSCustomObject]@{ Name="Disable Mouse Acceleration"; Cat="Gaming Performance"; Ben="Prevents input lag due to pointer acceleration."; Cmd={ Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSpeed" -Value 0; Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseThreshold1" -Value 0; Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseThreshold2" -Value 0 } },
     [PSCustomObject]@{ Name="Enable High Precision Timer"; Cat="Gaming Performance"; Ben="Improves game frame timing."; Cmd={ New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel" -Name "PerfCountFrequency" -PropertyType DWord -Value 1 -Force } },
-    [PSCustomObject]@{ Name="Disable Xbox Services"; Cat="Gaming Performance"; Ben="Removes unnecessary Xbox background services."; Cmd={ Stop-Service "XblGameSave" -ErrorAction SilentlyContinue; Set-Service "XblGameSave" -StartupType Disabled } }
+    [PSCustomObject]@{ Name="Disable Xbox Services"; Cat="Gaming Performance"; Ben="Removes unnecessary Xbox background services."; Cmd={ Stop-Service "XblGameSave" -ErrorAction SilentlyContinue; Set-Service "XblGameSave" -StartupType Disabled } },
+    [PSCustomObject]@{ Name="Set Game Priority to High"; Cat="Gaming Performance"; Ben="Automatically prioritizes game processes in Task Manager."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "Priority" -Value 6 } },
+    [PSCustomObject]@{ Name="Disable Fullscreen AutoMinimize"; Cat="Gaming Performance"; Ben="Prevents Windows from minimizing games automatically when Alt+Tabbing."; Cmd={ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "DisableAutoMinimize" -Value 1 } },
+    [PSCustomObject]@{ Name="Disable GPU Background Throttling"; Cat="Gaming Performance"; Ben="Prevents GPU from downclocking when idle."; Cmd={ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" -Name "TdrLevel" -Value 0 } },
+    [PSCustomObject]@{ Name="Disable V-Sync"; Cat="Gaming Performance"; Ben="Reduces input lag in games."; Cmd={ Set-ItemProperty -Path "HKCU:\Software\NVIDIA Corporation\Global\NvCplApi\Policies" -Name "SyncToVBlank" -Value 0 -Force } },
+    [PSCustomObject]@{ Name="Disable Windows Game Recording Overlay"; Cat="Gaming Performance"; Ben="Removes overlay that can reduce FPS."; Cmd={ Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR" -Name "AppCaptureEnabled" -Value 0 } }
 )
 
-# --- Network & Internet (10 real tweaks) ---
+# --- Network & Internet (15 real tweaks) ---
 $Sections["Network & Internet"] = @(
     [PSCustomObject]@{ Name="Enable TCP RSS"; Cat="Network & Internet"; Ben="Allows multi-core CPU handling of network packets."; Cmd={ netsh int tcp set global rss=enabled } },
     [PSCustomObject]@{ Name="Flush DNS Cache"; Cat="Network & Internet"; Ben="Clears stale DNS and resets Winsock."; Cmd={ ipconfig /flushdns; netsh winsock reset } },
@@ -29,10 +33,15 @@ $Sections["Network & Internet"] = @(
     [PSCustomObject]@{ Name="Disable IPv6 (if unused)"; Cat="Network & Internet"; Ben="Avoids network issues if IPv6 is not used."; Cmd={ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\TCPIP6\Parameters" -Name "DisabledComponents" -Value 0xFF -Force } },
     [PSCustomObject]@{ Name="Set DNS to Google"; Cat="Network & Internet"; Ben="Faster, reliable DNS resolution."; Cmd={ Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses "8.8.8.8","8.8.4.4" } },
     [PSCustomObject]@{ Name="Enable Jumbo Frames"; Cat="Network & Internet"; Ben="Reduces network overhead for large transfers."; Cmd={ Set-NetAdapterAdvancedProperty -Name "*" -DisplayName "Jumbo Packet" -DisplayValue "9014 Bytes" } },
-    [PSCustomObject]@{ Name="Disable Windows Auto-Tuning"; Cat="Network & Internet"; Ben="Reduces latency in some network scenarios."; Cmd={ netsh interface tcp set global autotuninglevel=disabled } }
+    [PSCustomObject]@{ Name="Disable Windows Auto-Tuning"; Cat="Network & Internet"; Ben="Reduces latency in some network scenarios."; Cmd={ netsh interface tcp set global autotuninglevel=disabled } },
+    [PSCustomObject]@{ Name="Disable SMBv1"; Cat="Network & Internet"; Ben="Improves security by disabling old SMB version."; Cmd={ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "SMB1" -Value 0 } },
+    [PSCustomObject]@{ Name="Enable TCP Chimney Offload"; Cat="Network & Internet"; Ben="Allows network offloading to reduce CPU load."; Cmd={ netsh int tcp set global chimney=enabled } },
+    [PSCustomObject]@{ Name="Set Network Profile to Private"; Cat="Network & Internet"; Ben="Secures PC on local networks."; Cmd={ Set-NetConnectionProfile -InterfaceAlias "Ethernet" -NetworkCategory Private } },
+    [PSCustomObject]@{ Name="Disable Large Send Offload"; Cat="Network & Internet"; Ben="Reduces packet segmentation latency."; Cmd={ Set-NetAdapterAdvancedProperty -Name "*" -DisplayName "Large Send Offload" -DisplayValue "Disabled" } },
+    [PSCustomObject]@{ Name="Disable Windows Peer-to-Peer Updates"; Cat="Network & Internet"; Ben="Prevents using your PC to upload updates."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode" -Value 0 } }
 )
 
-# --- Privacy & Security (10 real tweaks) ---
+# --- Privacy & Security (15 real tweaks) ---
 $Sections["Privacy & Security"] = @(
     [PSCustomObject]@{ Name="Disable Telemetry"; Cat="Privacy & Security"; Ben="Stops Windows telemetry and data collection."; Cmd={ Stop-Service 'DiagTrack' -ErrorAction SilentlyContinue; Set-Service 'DiagTrack' -StartupType Disabled } },
     [PSCustomObject]@{ Name="Disable Advertising ID"; Cat="Privacy & Security"; Ben="Stops personalized ads."; Cmd={ Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" -Name "Enabled" -Value 0 } },
@@ -43,10 +52,15 @@ $Sections["Privacy & Security"] = @(
     [PSCustomObject]@{ Name="Disable Windows Error Reporting"; Cat="Privacy & Security"; Ben="Prevents error reporting pop-ups."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting" -Name "Disabled" -Value 1 } },
     [PSCustomObject]@{ Name="Disable App Suggestions"; Cat="Privacy & Security"; Ben="Prevents Windows from suggesting apps."; Cmd={ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SystemPaneSuggestionsEnabled" -Value 0 } },
     [PSCustomObject]@{ Name="Disable Background Apps"; Cat="Privacy & Security"; Ben="Stops unnecessary apps running in background."; Cmd={ Get-Process | Where-Object {$_.Name -in @("MicrosoftEdge","OneDrive") } | Stop-Process -Force } },
-    [PSCustomObject]@{ Name="Disable Windows Spotlight"; Cat="Privacy & Security"; Ben="Prevents Spotlight background downloads."; Cmd={ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "RotatingLockScreenEnabled" -Value 0 } }
+    [PSCustomObject]@{ Name="Disable Windows Spotlight"; Cat="Privacy & Security"; Ben="Prevents Spotlight background downloads."; Cmd={ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "RotatingLockScreenEnabled" -Value 0 } },
+    [PSCustomObject]@{ Name="Disable Diagnostic Tracking"; Cat="Privacy & Security"; Ben="Reduces telemetry and diagnostics."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 } },
+    [PSCustomObject]@{ Name="Disable Connected User Experience"; Cat="Privacy & Security"; Ben="Prevents background data uploads."; Cmd={ Stop-Service "DiagTrack" -ErrorAction SilentlyContinue } },
+    [PSCustomObject]@{ Name="Disable SmartScreen"; Cat="Privacy & Security"; Ben="Prevents Windows from scanning apps online."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "SmartScreenEnabled" -Value "Off" } },
+    [PSCustomObject]@{ Name="Disable Wi-Fi Sense"; Cat="Privacy & Security"; Ben="Prevents automatic Wi-Fi sharing."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config" -Name "AutoConnectAllowedOEM" -Value 0 } },
+    [PSCustomObject]@{ Name="Disable Cortana Cloud Search"; Cat="Privacy & Security"; Ben="Prevents Cortana from sending search queries online."; Cmd={ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Value 0 } }
 )
 
-# --- Winget App Installer (10 apps) ---
+# --- Winget Apps (15 apps) ---
 $Sections["Winget Apps"] = @(
     [PSCustomObject]@{ Name="Install Google Chrome"; Cat="Winget Apps"; Ben="Installs Google Chrome via winget."; Cmd={ & winget install --id "Google.Chrome" -e } },
     [PSCustomObject]@{ Name="Install 7-Zip"; Cat="Winget Apps"; Ben="Installs 7-Zip via winget."; Cmd={ & winget install --id "7zip.7zip" -e } },
@@ -57,17 +71,21 @@ $Sections["Winget Apps"] = @(
     [PSCustomObject]@{ Name="Install Spotify"; Cat="Winget Apps"; Ben="Installs Spotify music app."; Cmd={ & winget install --id "Spotify.Spotify" -e } },
     [PSCustomObject]@{ Name="Install Steam"; Cat="Winget Apps"; Ben="Installs Steam client."; Cmd={ & winget install --id "Valve.Steam" -e } },
     [PSCustomObject]@{ Name="Install OBS Studio"; Cat="Winget Apps"; Ben="Installs OBS Studio."; Cmd={ & winget install --id "OBSProject.OBSStudio" -e } },
-    [PSCustomObject]@{ Name="Install Zoom"; Cat="Winget Apps"; Ben="Installs Zoom client."; Cmd={ & winget install --id "Zoom.Zoom" -e } }
+    [PSCustomObject]@{ Name="Install Zoom"; Cat="Winget Apps"; Ben="Installs Zoom client."; Cmd={ & winget install --id "Zoom.Zoom" -e } },
+    [PSCustomObject]@{ Name="Install Microsoft Edge"; Cat="Winget Apps"; Ben="Installs Edge browser."; Cmd={ & winget install --id "Microsoft.Edge" -e } },
+    [PSCustomObject]@{ Name="Install Paint.NET"; Cat="Winget Apps"; Ben="Installs Paint.NET editor."; Cmd={ & winget install --id "dotPDN.Paint.NET" -e } },
+    [PSCustomObject]@{ Name="Install FileZilla"; Cat="Winget Apps"; Ben="Installs FileZilla FTP client."; Cmd={ & winget install --id "FileZilla.FileZilla" -e } },
+    [PSCustomObject]@{ Name="Install Git"; Cat="Winget Apps"; Ben="Installs Git for version control."; Cmd={ & winget install --id "Git.Git" -e } },
+    [PSCustomObject]@{ Name="Install VS Code"; Cat="Winget Apps"; Ben="Installs Visual Studio Code."; Cmd={ & winget install --id "Microsoft.VisualStudioCode" -e } }
 )
 
-# --- 2. GUI SETUP ---
+# --- GUI and Buttons --- (same as previous working version) ---
 $Form = New-Object System.Windows.Forms.Form
 $Form.Text = "Ultra Lean Optimization Utility - Full Control Center"
 $Form.Size = New-Object System.Drawing.Size(1200, 900)
 $Form.StartPosition = "CenterScreen"
 $Form.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
 
-# --- 3. Description Label ---
 $Intel = New-Object System.Windows.Forms.Label
 $Intel.Text = ">>> Hover over a tweak to see its benefit."
 $Intel.Font = New-Object System.Drawing.Font("Consolas",12,[System.Drawing.FontStyle]::Bold)
@@ -79,13 +97,11 @@ $Intel.TextAlign = "MiddleCenter"
 $Intel.BorderStyle = "FixedSingle"
 $Form.Controls.Add($Intel)
 
-# --- 4. Tab Control ---
 $TabControl = New-Object System.Windows.Forms.TabControl
 $TabControl.Size = New-Object System.Drawing.Size(1150,700)
 $TabControl.Location = New-Object System.Drawing.Point(20,70)
 $Form.Controls.Add($TabControl)
 
-# --- 5. Create Tabs Dynamically ---
 $TabPages = @{}
 foreach ($Cat in $Sections.Keys) {
     $Tab = New-Object System.Windows.Forms.TabPage
@@ -99,7 +115,6 @@ foreach ($Cat in $Sections.Keys) {
     $TabControl.TabPages.Add($Tab)
 }
 
-# --- 6. Add Checkboxes Dynamically ---
 $Checkboxes = @()
 foreach ($Cat in $Sections.Keys) {
     foreach ($Tweak in $Sections[$Cat]) {
@@ -115,7 +130,6 @@ foreach ($Cat in $Sections.Keys) {
     }
 }
 
-# --- 7. Buttons ---
 $BackupBtn = New-Object System.Windows.Forms.Button
 $BackupBtn.Text = "CREATE RESTORE POINT"
 $BackupBtn.Size = New-Object System.Drawing.Size(550,50)
@@ -151,5 +165,4 @@ $RunBtn.Add_Click({
 })
 $Form.Controls.Add($RunBtn)
 
-# --- 8. Show GUI ---
 $Form.ShowDialog() | Out-Null
