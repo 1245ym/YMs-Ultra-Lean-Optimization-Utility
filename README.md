@@ -1,28 +1,13 @@
 # 🚀 Ultra Lean Windows Optimization Utility
 
+SCROLL ALL THE WAY TO THE BOTTOM FOR THE UTILITY LAUNCHER ⬇️
+FIRST READ MY README.MD FIRST (RECOMMENDED)
+
 ## 📋 Overview
 Ultra Lean Windows Optimization Utility is a powerful, GUI‑based tool designed to enhance Windows performance through real system tweaks, latency reductions, privacy controls, and optional app installations. Built with modularity and clarity in mind, it provides an intuitive interface and safe, reversible optimizations.
 
 ## 🌟 Key Highlights
-- ⚡ 60+ real system tweaks  
-- 🎮 Gaming performance enhancements  
-- 🌐 Network & Internet optimizations  
-- 🔐 Privacy & security hardening  
-- 📦 One‑click Winget app installer  
-- 🛡️ Built‑in restore point creation  
-- 🧩 Clean, intuitive Windows Forms GUI  
-- 🔄 Safe, reversible changes  
-
----
-
-## 🚀 Quick Start
-
-### Run instantly (PowerShell, Run as Administrator):
-```powershell
-
-➡️ irm https://raw.githubusercontent.com/1245ym/YMs-Ultra-Lean-Optimization-Utility/refs/heads/main/YMs-Ultra-Lean-Optimization-Utility.ps1 | iex
-
- ## 🎮 Gaming Performance (15 Tweaks)
+## 🎮 Gaming Performance (15 Tweaks)
 - Disable GameDVR  
 - Enable Hardware‑Accelerated GPU Scheduling  
 - Disable Fullscreen Optimizations  
@@ -132,4 +117,17 @@ If this utility improved your system, starring the repository helps others disco
 ---
 
 ## 📜 License
-MIT License
+MIT License- ⚡ 60+ real system tweaks  
+- 🎮 Gaming performance enhancements  
+- 🌐 Network & Internet optimizations  
+- 🔐 Privacy & security hardening  
+- 📦 One‑click Winget app installer  
+- 🛡️ Built‑in restore point creation  
+- 🧩 Clean, intuitive Windows Forms GUI  
+- 🔄 Safe, reversible changes  
+
+---
+
+Run the utility here
+
+➡️ irm https://raw.githubusercontent.com/1245ym/YMs-Ultra-Lean-Optimization-Utility/refs/heads/main/YMs-Ultra-Lean-Optimization-Utility.ps1 | iex 
