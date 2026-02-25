@@ -1,11 +1,5 @@
 Ultra Lean Windows Optimization Utility
-https://img.shields.io/badge/PowerShell-5%2B-5391FE?logo=powershell&logoColor=white
-https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows&logoColor=white
-https://img.shields.io/badge/License-MIT-green.svg
-https://img.shields.io/badge/Project-Active-brightgreen
-https://img.shields.io/badge/Tweaks-60%2B-blue
-https://img.shields.io/badge/Interface-GUI%20%2F%20WinForms-orange
-https://img.shields.io/badge/Architecture-PowerShell%20Script-lightgrey
+
 A modern, GUI‑based Windows optimization tool designed to improve performance, reduce latency, enhance gaming responsiveness, and give users full control over 60+ real system tweaks — all through a clean, intuitive interface.
 ⚡ Quick Install & Run
 Run this command in PowerShell (Run as Administrator):
