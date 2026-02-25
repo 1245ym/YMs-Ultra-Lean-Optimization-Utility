@@ -22,7 +22,7 @@ Ultra Lean Windows Optimization Utility is a powerful, GUI‑based tool designed
 
 ➡️ irm https://raw.githubusercontent.com/1245ym/YMs-Ultra-Lean-Optimization-Utility/refs/heads/main/YMs-Ultra-Lean-Optimization-Utility.ps1 | iex
 
-## 🎮 Gaming Performance (15 Tweaks)
+ ## 🎮 Gaming Performance (15 Tweaks)
 - Disable GameDVR  
 - Enable Hardware‑Accelerated GPU Scheduling  
 - Disable Fullscreen Optimizations  
