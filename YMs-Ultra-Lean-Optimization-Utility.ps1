@@ -34,7 +34,7 @@ $Sections["Network & Internet"] = @(
     [PSCustomObject]@{ Name="Set DNS to Google"; Cat="Network & Internet"; Ben="Faster, reliable DNS resolution."; Cmd={ Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses "8.8.8.8","8.8.4.4" } },
     [PSCustomObject]@{ Name="Enable Jumbo Frames"; Cat="Network & Internet"; Ben="Reduces network overhead for large transfers."; Cmd={ Set-NetAdapterAdvancedProperty -Name "*" -DisplayName "Jumbo Packet" -DisplayValue "9014 Bytes" } },
     [PSCustomObject]@{ Name="Disable Windows Auto-Tuning"; Cat="Network & Internet"; Ben="Reduces latency in some network scenarios."; Cmd={ netsh interface tcp set global autotuninglevel=disabled } },
-    [PSCustomObject]@{ Name="Disable SMBv1"; Cat="Network & Internet"; Ben="Improves security by disabling old SMB version."; Cmd={ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "SMB1" -Value 0 } },
+    [PSCustomObject]@{ Name="Disable SMBv1"; Cat="Network & Internet"; Ben="Improves security by disabling outdated SMBv1 protocol."; Cmd={ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "SMB1" -Value 0 } },
     [PSCustomObject]@{ Name="Enable TCP Chimney Offload"; Cat="Network & Internet"; Ben="Allows network offloading to reduce CPU load."; Cmd={ netsh int tcp set global chimney=enabled } },
     [PSCustomObject]@{ Name="Set Network Profile to Private"; Cat="Network & Internet"; Ben="Secures PC on local networks."; Cmd={ Set-NetConnectionProfile -InterfaceAlias "Ethernet" -NetworkCategory Private } },
     [PSCustomObject]@{ Name="Disable Large Send Offload"; Cat="Network & Internet"; Ben="Reduces packet segmentation latency."; Cmd={ Set-NetAdapterAdvancedProperty -Name "*" -DisplayName "Large Send Offload" -DisplayValue "Disabled" } },
@@ -55,7 +55,7 @@ $Sections["Privacy & Security"] = @(
     [PSCustomObject]@{ Name="Disable Windows Spotlight"; Cat="Privacy & Security"; Ben="Prevents Spotlight background downloads."; Cmd={ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "RotatingLockScreenEnabled" -Value 0 } },
     [PSCustomObject]@{ Name="Disable Diagnostic Tracking"; Cat="Privacy & Security"; Ben="Reduces telemetry and diagnostics."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 } },
     [PSCustomObject]@{ Name="Disable Connected User Experience"; Cat="Privacy & Security"; Ben="Prevents background data uploads."; Cmd={ Stop-Service "DiagTrack" -ErrorAction SilentlyContinue } },
-    [PSCustomObject]@{ Name="Disable SmartScreen"; Cat="Privacy & Security"; Ben="Prevents Windows from scanning apps online."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "SmartScreenEnabled" -Value "Off" } },
+    [PSCustomObject]@{ Name="Disable SmartScreen"; Cat="Privacy & Security"; Ben="Reduces SmartScreen filtering (not recommended for security)."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "SmartScreenEnabled" -Value "Off" } },
     [PSCustomObject]@{ Name="Disable Wi-Fi Sense"; Cat="Privacy & Security"; Ben="Prevents automatic Wi-Fi sharing."; Cmd={ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config" -Name "AutoConnectAllowedOEM" -Value 0 } },
     [PSCustomObject]@{ Name="Disable Cortana Cloud Search"; Cat="Privacy & Security"; Ben="Prevents Cortana from sending search queries online."; Cmd={ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Value 0 } }
 )
@@ -79,7 +79,7 @@ $Sections["Winget Apps"] = @(
     [PSCustomObject]@{ Name="Install VS Code"; Cat="Winget Apps"; Ben="Installs Visual Studio Code."; Cmd={ & winget install --id "Microsoft.VisualStudioCode" -e } }
 )
 
-# --- GUI and Buttons --- (same as previous working version) ---
+# --- GUI and Buttons ---
 $Form = New-Object System.Windows.Forms.Form
 $Form.Text = "Ultra Lean Optimization Utility - Full Control Center"
 $Form.Size = New-Object System.Drawing.Size(1200, 900)
@@ -98,71 +98,4 @@ $Intel.BorderStyle = "FixedSingle"
 $Form.Controls.Add($Intel)
 
 $TabControl = New-Object System.Windows.Forms.TabControl
-$TabControl.Size = New-Object System.Drawing.Size(1150,700)
-$TabControl.Location = New-Object System.Drawing.Point(20,70)
-$Form.Controls.Add($TabControl)
-
-$TabPages = @{}
-foreach ($Cat in $Sections.Keys) {
-    $Tab = New-Object System.Windows.Forms.TabPage
-    $Tab.Text = $Cat
-    $FlowPanel = New-Object System.Windows.Forms.FlowLayoutPanel
-    $FlowPanel.Name = "FlowPanel"
-    $FlowPanel.Dock = "Fill"
-    $FlowPanel.AutoScroll = $true
-    $Tab.Controls.Add($FlowPanel)
-    $TabPages[$Cat] = $Tab
-    $TabControl.TabPages.Add($Tab)
-}
-
-$Checkboxes = @()
-foreach ($Cat in $Sections.Keys) {
-    foreach ($Tweak in $Sections[$Cat]) {
-        $CB = New-Object System.Windows.Forms.CheckBox
-        $CB.Text = $Tweak.Name
-        $CB.Tag = $Tweak
-        $CB.AutoSize = $true
-        $CB.Font = New-Object System.Drawing.Font("Segoe UI",10)
-        $CB.Add_MouseEnter({ $Intel.Text = ">>> Benefit: " + $this.Tag.Ben })
-        $CB.Add_MouseLeave({ $Intel.Text = ">>> Hover over a tweak to see its benefit." })
-        $TabPages[$Cat].Controls["FlowPanel"].Controls.Add($CB)
-        $Checkboxes += $CB
-    }
-}
-
-$BackupBtn = New-Object System.Windows.Forms.Button
-$BackupBtn.Text = "CREATE RESTORE POINT"
-$BackupBtn.Size = New-Object System.Drawing.Size(550,50)
-$BackupBtn.Location = New-Object System.Drawing.Point(20,780)
-$BackupBtn.BackColor = [System.Drawing.Color]::FromArgb(40,40,40)
-$BackupBtn.ForeColor = [System.Drawing.Color]::Yellow
-$BackupBtn.FlatStyle = "Flat"
-$BackupBtn.Font = New-Object System.Drawing.Font("Segoe UI",10,[System.Drawing.FontStyle]::Bold)
-$BackupBtn.Add_Click({
-    $Intel.Text = "Creating system restore point..."
-    Checkpoint-Computer -Description "UltraLean_Backup" -RestorePointType "MODIFY_SETTINGS" -ErrorAction SilentlyContinue
-    $Intel.Text = "Restore point created successfully!"
-})
-$Form.Controls.Add($BackupBtn)
-
-$RunBtn = New-Object System.Windows.Forms.Button
-$RunBtn.Text = "APPLY SELECTED TWEAKS"
-$RunBtn.Size = New-Object System.Drawing.Size(550,50)
-$RunBtn.Location = New-Object System.Drawing.Point(600,780)
-$RunBtn.BackColor = [System.Drawing.Color]::FromArgb(30,30,40)
-$RunBtn.ForeColor = [System.Drawing.Color]::Cyan
-$RunBtn.FlatStyle = "Flat"
-$RunBtn.Font = New-Object System.Drawing.Font("Segoe UI",10,[System.Drawing.FontStyle]::Bold)
-$RunBtn.Add_Click({
-    $Applied = 0
-    foreach ($CB in $Checkboxes) {
-        if ($CB.Checked) {
-            Write-Host "Applying: $($CB.Text)" -ForegroundColor Cyan
-            try { & $CB.Tag.Cmd; $Applied++ } catch { Write-Host "Failed: $($CB.Text)" -ForegroundColor Red }
-        }
-    }
-    [System.Windows.Forms.MessageBox]::Show("$Applied tweaks applied! Restart PC for changes to take effect.")
-})
-$Form.Controls.Add($RunBtn)
-
-$Form.ShowDialog() | Out-Null
+$TabControl.Size = New-
